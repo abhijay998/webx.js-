@@ -1,5 +1,16 @@
 # Webx-cdn
-A web framework for vanila JS to make it Better and Dynamic Like react Has Dynamic Styling Structure and logic and the support of morden js libraries
+A web framework for vanila JS to make it Better and Dynamic Like react Has Dynamic Styling Structure and logic and the support of morden js libraries and reusable components it features like local storage utility functions dynamic key evvents making 125 lines code into just 19 lines of code you can check out - https://minimalisticcalculator.netlify.app/  // to check out a project made by this which has dynamic CSS and please check out the wiki which also contains details of this in much more detail and also has the official docs
+// code snippet - 
+``` JS
+webx.keyEvent({
+  keydown: true,
+  key: "UpArrow",
+  eventCode: function () {
+    h1("You pressed UpArrow", root); // when key is pressed then a h1 tag is genrated
+  }
+}); // one of many features
+```
+
 
 # Proprietary License
 Copyright © 2025 Abhijay Singh Meena
