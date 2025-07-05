@@ -6,7 +6,6 @@
  */
 
 /* read LICENSE */
-
  const root = document.getElementById("root");
 const body = document.body;
 const head = document.head;
@@ -1026,20 +1025,20 @@ function AddMaterial3Lib() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     const s = document.createElement('style');
-    s.innerHTML = '  md-icon {\n' +
-        '    font-family: \'Material Symbols Outlined\';\n' +
-        '    font-weight: normal;\n' +
-        '    font-style: normal;\n' +
-        '    font-size: 24px;\n' +
-        '    line-height: 1;\n' +
-        '    letter-spacing: normal;\n' +
-        '    text-transform: none;\n' +
-        '    display: inline-block;\n' +
-        '    white-space: nowrap;\n' +
-        '    direction: ltr;\n' +
-        '    -webkit-font-feature-settings: \'liga\';\n' +
-        '    -webkit-font-smoothing: antialiased;\n' +
-        '  }'
+    s.innerHTML = `md-icon {
+        font-family: 'Material Symbols Outlined';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }`
     document.head.appendChild(s);
 } function AddTailwindLib(callback) {
     const preloadLink = document.createElement('link');
@@ -1084,20 +1083,20 @@ function AddMaterial3Lib() {
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     const s = document.createElement('style');
-    s.innerHTML = '  md-icon {\n' +
-        '    font-family: \'Material Symbols Outlined\';\n' +
-        '    font-weight: normal;\n' +
-        '    font-style: normal;\n' +
-        '    font-size: 24px;\n' +
-        '    line-height: 1;\n' +
-        '    letter-spacing: normal;\n' +
-        '    text-transform: none;\n' +
-        '    display: inline-block;\n' +
-        '    white-space: nowrap;\n' +
-        '    direction: ltr;\n' +
-        '    -webkit-font-feature-settings: \'liga\';\n' +
-        '    -webkit-font-smoothing: antialiased;\n' +
-        '  }'
+    s.innerHTML = `md-icon {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}`
     document.head.appendChild(s);
     const script = document.createElement('script');
     script.src = 'https://cdn.tailwindcss.com';
