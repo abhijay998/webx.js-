@@ -9,6 +9,7 @@
 
  const root = document.getElementById("root");
 const body = document.body;
+const head = document.head;
 
 function getById(id) {
     return document.getElementById(id);
@@ -17,6 +18,10 @@ function getById(id) {
 function log(args, color, from) {
     if(from) { console.log(`%c[${from}]`, `color: ${color};`, args); }
     else { console.log('%c[webx]', `color: ${color};`, args); }
+}
+
+function err(error) {
+    console.log(error)
 }
 
 function logS(args, color, style, from) {
@@ -521,28 +526,118 @@ const webx = {
         }
     },
 
-    CreateApp: function ({ home }) {
+    CreateApp: function ({ home, isParentReq = true }) {
         const App = document.createElement('div');
         App.appendChild(home)
-        body.appendChild(App);
+        if(isParentReq) { body.appendChild(App); }
         return App;
     },
 
     animate: {
-        fadeIn: ({element, duration = 300}) => {
+        fadeIn: ({ element, duration = 300, easing = 'ease-in-out', delay = 0 }) => {
             element.style.opacity = '0';
-            element.style.transition = `opacity ${duration}ms`;
-            setTimeout(() => element.style.opacity = '1', 10);
+            element.style.transition = `opacity ${duration}ms ${easing}`;
+            setTimeout(() => {
+                element.style.opacity = '1';
+            }, delay);
         },
-        
-        slideUp: ({element, duration = 300}) => {
-            element.style.transition = `height ${duration}ms`;
-            element.style.height = '0';
+    
+        fadeOut: ({ element, duration = 300, easing = 'ease-in-out', delay = 0 }) => {
+            element.style.opacity = '1';
+            element.style.transition = `opacity ${duration}ms ${easing}`;
+            setTimeout(() => {
+                element.style.opacity = '0';
+            }, delay);
+        },
+    
+        slideUp: ({ element, duration = 300, easing = 'ease-in-out', delay = 0 }) => {
+            const height = element.offsetHeight;
+            element.style.transition = `height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+            element.style.height = `${height}px`;
+            element.style.opacity = '1';
             element.style.overflow = 'hidden';
+            setTimeout(() => {
+                element.style.height = '0';
+                element.style.opacity = '0';
+            }, delay);
         },
-        
-        bounce: ({element}) => {
-            element.style.animation = 'bounce 0.5s ease-in-out';
+    
+        slideDown: ({ element, duration = 300, easing = 'ease-in-out', delay = 0 }) => {
+            element.style.height = '0';
+            element.style.opacity = '0';
+            element.style.overflow = 'hidden';
+            element.style.transition = `height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+            setTimeout(() => {
+                const height = element.scrollHeight;
+                element.style.height = `${height}px`;
+                element.style.opacity = '1';
+                setTimeout(() => {
+                    element.style.height = 'auto';
+                }, duration);
+            }, delay);
+        },
+    
+        bounce: ({ element, duration = 500, easing = 'ease-in-out', cycles = 2, amplitude = 10, delay = 0 }) => {
+            const keyframes = `
+                @keyframes bounce {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-${amplitude}px); }
+                }
+            `;
+            const styleSheet = document.createElement('style');
+            styleSheet.textContent = keyframes;
+            document.head.appendChild(styleSheet);
+            element.style.animation = `bounce ${duration}ms ${easing} ${cycles}`;
+            setTimeout(() => {
+                element.style.animation = '';
+                styleSheet.remove();
+            }, duration * cycles + delay);
+        },
+    
+        scale: ({ element, duration = 300, easing = 'ease-in-out', scaleFrom = 0, scaleTo = 1, delay = 0 }) => {
+            element.style.transform = `scale(${scaleFrom})`;
+            element.style.transition = `transform ${duration}ms ${easing}`;
+            setTimeout(() => {
+                element.style.transform = `scale(${scaleTo})`;
+            }, delay);
+        },
+    
+        rotate: ({ element, duration = 300, easing = 'ease-in-out', degrees = 360, delay = 0 }) => {
+            element.style.transform = `rotate(0deg)`;
+            element.style.transition = `transform ${duration}ms ${easing}`;
+            setTimeout(() => {
+                element.style.transform = `rotate(${degrees}deg)`;
+            }, delay);
+        }
+    },
+
+    Navigate: function ({ Page, Mount = body, OnNavigation, animate = true, animation = 'fadeIn', duration = 500, delay = 0 }) {
+        Mount.innerHTML = '';
+        Mount.appendChild(Page);
+        if(animate) {
+            if (Mount.firstChild) {
+                webx.animate.fadeOut({
+                    element: Mount.firstChild,
+                    duration: duration / 2,
+                    easing: 'ease-out'
+                });
+            } const timeout = setTimeout(() => {
+                Mount.innerHTML = '';
+                Mount.appendChild(Page);
+                webx.animate[animation]({
+                    element: Page,
+                    duration,
+                    delay,
+                    easing: 'ease-in-out'
+                }); if (typeof OnNavigation === 'function') {
+                    OnNavigation();
+                }
+                clearTimeout(timeout);
+            }, duration / 2);
+        } else {
+            if (typeof OnNavigation === 'function') {
+                OnNavigation();
+            }
         }
     }
 }
@@ -926,6 +1021,91 @@ function AddMaterial3Lib() {
         document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
     `;
     document.head.appendChild(moduleScript);
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    const s = document.createElement('style');
+    s.innerHTML = '  md-icon {\n' +
+        '    font-family: \'Material Symbols Outlined\';\n' +
+        '    font-weight: normal;\n' +
+        '    font-style: normal;\n' +
+        '    font-size: 24px;\n' +
+        '    line-height: 1;\n' +
+        '    letter-spacing: normal;\n' +
+        '    text-transform: none;\n' +
+        '    display: inline-block;\n' +
+        '    white-space: nowrap;\n' +
+        '    direction: ltr;\n' +
+        '    -webkit-font-feature-settings: \'liga\';\n' +
+        '    -webkit-font-smoothing: antialiased;\n' +
+        '  }'
+    document.head.appendChild(s);
+} function AddTailwindLib(callback) {
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.href = 'https://cdn.tailwindcss.com';
+    preloadLink.as = 'script';
+    document.head.appendChild(preloadLink);
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.tailwindcss.com';
+    script.onload = () => {
+        console.log('Tailwind CDN loaded successfully');
+        if (callback) callback();
+    };
+    script.onerror = () => console.error('Failed to load Tailwind CDN');
+    document.head.appendChild(script);
+} function AddAll() {
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap';
+    document.head.appendChild(fontLink);
+
+    const importMap = document.createElement('script');
+    importMap.type = 'importmap';
+    importMap.innerHTML = JSON.stringify({
+        imports: {
+            "@material/web/": "https://esm.run/@material/web/"
+        }
+    });
+    document.head.appendChild(importMap);
+
+    const moduleScript = document.createElement('script');
+    moduleScript.type = 'module';
+    moduleScript.innerHTML = `
+        import '@material/web/all.js';
+        import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    `;
+    document.head.appendChild(moduleScript);
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+    const s = document.createElement('style');
+    s.innerHTML = '  md-icon {\n' +
+        '    font-family: \'Material Symbols Outlined\';\n' +
+        '    font-weight: normal;\n' +
+        '    font-style: normal;\n' +
+        '    font-size: 24px;\n' +
+        '    line-height: 1;\n' +
+        '    letter-spacing: normal;\n' +
+        '    text-transform: none;\n' +
+        '    display: inline-block;\n' +
+        '    white-space: nowrap;\n' +
+        '    direction: ltr;\n' +
+        '    -webkit-font-feature-settings: \'liga\';\n' +
+        '    -webkit-font-smoothing: antialiased;\n' +
+        '  }'
+    document.head.appendChild(s);
+    const script = document.createElement('script');
+    script.src = 'https://cdn.tailwindcss.com';
+    script.onload = () => {
+        log('sucess', Colors.lime[500])
+    };
+    script.onerror = () => console.error('Failed to load Tailwind CDN');
+    document.head.appendChild(script);
 }
 
 
@@ -1252,3 +1432,364 @@ const colors = {
     black: '#000000',
     transparent: '#00000000',
 };
+
+function normalizeAttributes(...args) {
+    const attrList = [];
+
+    args.forEach(item => {
+        if (!item) return;
+
+        if (Array.isArray(item)) {
+            item.forEach(attr => {
+                if (attr && typeof attr.key === 'string') {
+                    attrList.push(attr);
+                }
+            });
+        } else if (typeof item === 'object') {
+            for (const [key, value] of Object.entries(item)) {
+                if (typeof key === 'string') {
+                    attrList.push({ key, value });
+                }
+            }
+        }
+    });
+
+    return attrList;
+}
+
+ function Button({
+    type = 'filled',
+    margin = 2,
+    BorderRadius,
+    Html,
+    Parent = null,
+    eventC,
+    attributes
+}) {
+    const btn = webx.createElement({
+        tag: `md-${type}-button`,
+        html: Html,
+        parent: Parent,
+        attribute: normalizeAttributes(
+            { key: 'class', value: `m-${margin}` },
+            BorderRadius ? { key: 'class', value: `rounded-${BorderRadius}` } : null,
+            attributes
+        ),
+        event: 'click',
+        eventCode: () => {
+            if (typeof eventC === 'function') eventC();
+        }
+    });
+
+    return btn;
+}
+
+ function Icon({
+    margin = 2,
+    Name,
+    attributes,
+    Parent = null,
+    eventC,
+}) {
+    const Ico = webx.createElement({
+        tag: `md-icon`,
+        html: Name,
+        parent: Parent,
+        attribute: normalizeAttributes(
+            { key: 'class', value: `m-${margin}` },
+            attributes
+        ),
+        event: 'click',
+        eventCode: () => {
+            if (typeof eventC === 'function') eventC();
+        }
+    });
+
+    return Ico;
+}
+
+ function FAB({
+    AriaLabel = "Edit",
+    Icon = "edit",
+    margin = 2,
+    label,
+    Parent = null,
+    eventC,
+    attributes
+}) {
+    const fb = webx.createElement({
+        tag: `md-fab`,
+        html: webx.createElement({
+            tag: 'md-icon',
+            html: Icon,
+            attribute: { key: 'slot', value: 'icon' },
+        }),
+        parent: Parent,
+        attribute: normalizeAttributes(
+            { key: 'class', value: `m-${margin}` },
+            label ? { key: 'label', value: label } : null,
+            { key: 'aria-label', value: AriaLabel },
+            attributes
+        ),
+        event: 'click',
+        eventCode: () => {
+            if (typeof eventC === 'function') eventC();
+        }
+    });
+
+    return fb;
+}
+
+ function Loader({
+    type = 'linear',
+    Value,
+    indeterminate = false,
+    fourColor = false,
+    buffer,
+    Parent = null,
+    attributes = {}
+}) {
+    const attrList = [];
+    if (Value != null) {
+        attrList.push({ key: 'value', value: Value });
+    } if (indeterminate) {
+        attrList.push({ key: 'indeterminate', value: 'true' });
+    } if (buffer) {
+        attrList.push({ key: 'buffer', value: buffer });
+    } if (fourColor) {
+        attrList.push({ key: 'four-color', value: 'true' });
+    } if (attributes && typeof attributes === 'object') {
+        if (Array.isArray(attributes)) {
+            attributes.forEach(attr => {
+                if (attr && typeof attr.key === 'string') {
+                    attrList.push(attr);
+                }
+            });
+        } else {
+            for (const [key, value] of Object.entries(attributes)) {
+                attrList.push({ key, value });
+            }
+        }
+    }
+    const element = document.createElement(`md-${type}-progress`);
+    attrList.forEach(attr => {
+        if (attr.value === '' || attr.value === true || attr.value === 'true') {
+            element.setAttribute(attr.key, '');
+        } else {
+            element.setAttribute(attr.key, attr.value);
+        }
+    });
+
+    if (Parent) Parent.appendChild(element);
+
+    return element;
+}
+
+ function AppBar({
+    title = '',
+    leading = null,
+    actions = [],
+    backgroundColor = '',
+    elevation = 0,
+    Parent = null,
+    attributes = []
+}) {
+    const children = [];
+    if (leading) {
+        const leadingSlot = webx.createElement({
+            tag: 'div',
+            attribute: { key: 'slot', value: 'navigationIcon' },
+            html: leading
+        });
+        children.push(leadingSlot);
+    }
+    if (title) {
+        const titleEl = webx.createElement({
+            tag: 'div',
+            attribute: { key: 'slot', value: 'title' },
+            html: title
+        });
+        children.push(titleEl);
+    }
+    actions.forEach(action => {
+        const actionEl = webx.createElement({
+            tag: 'div',
+            attribute: { key: 'slot', value: 'actionItems' },
+            html: action
+        });
+        children.push(actionEl);
+    });
+    const classStr = `p-4 flex items-center justify-between ${backgroundColor ? `bg-${backgroundColor}` : `bg-white`} ${elevation ? `shadow-${elevation}` : ''}`;
+    const attrList = [
+        { key: 'class', value: classStr },
+        ...Array.isArray(attributes) ? attributes : Object.entries(attributes).map(([key, value]) => ({ key, value }))
+    ];
+
+    const appbar = webx.createElement({
+        tag: 'md-top-app-bar',
+        attribute: attrList,
+        parent: Parent,
+        html: children
+    });
+
+    return appbar;
+}
+
+function applyAttributes(el, attributes) {
+    if (!attributes) return;
+
+    if (Array.isArray(attributes)) {
+        attributes.forEach(({ key, value }) => {
+            if (value === '' || value === true || value === 'true') {
+                el.setAttribute(key, '');
+            } else {
+                el.setAttribute(key, value);
+            }
+        });
+    } else if (typeof attributes === 'object') {
+        for (const [key, value] of Object.entries(attributes)) {
+            if (value === '' || value === true || value === 'true') {
+                el.setAttribute(key, '');
+            } else {
+                el.setAttribute(key, value);
+            }
+        }
+    }
+}
+
+function Checkbox({
+    checked = false,
+    indeterminate = false,
+    Parent = null,
+    attributes = [],
+    onClick,
+}) {
+    const checkbox = document.createElement('md-checkbox');
+    if (checked) checkbox.setAttribute('checked', '');
+    if (indeterminate) checkbox.setAttribute('indeterminate', '');
+    applyAttributes(checkbox, attributes);
+    if (Parent) Parent.appendChild(checkbox);
+    if(onClick) {
+        checkbox.addEventListener('click', function () {
+            onClick();
+        })
+    }
+    return checkbox;
+}
+
+function Radio({
+    checked = false,
+    value = '',
+    name = '',
+    Parent = null,
+    attributes = [],
+    onClick,
+}) {
+    const radio = document.createElement('md-radio');
+    if (checked) radio.setAttribute('checked', '');
+    if (value) radio.setAttribute('value', value);
+    if (name) radio.setAttribute('name', name);
+    applyAttributes(radio, attributes);
+    if (Parent) Parent.appendChild(radio);
+    if(onClick) {
+        radio.addEventListener('click', function () {
+            onClick();
+        })
+    }
+    return radio;
+}
+
+function Slider({
+    withTicks = false,
+    isRange = false,
+    value = 50,
+    valueStart = 25,
+    valueEnd = 75,
+    Parent = null,
+    BorderRadius,
+    attributes = [],
+    eventC = {}
+}) {
+    const slider = webx.createElement({
+        tag: 'md-slider',
+        parent: Parent,
+        attribute: normalizeAttributes(
+            BorderRadius ? { key: 'class', value: BorderRadius } : null,
+            ...attributes,
+            withTicks ? { key: 'ticks' } : null,
+            isRange
+                ? [
+                    { key: 'range' },
+                    { key: 'value-start', value: valueStart },
+                    { key: 'value-end', value: valueEnd }
+                ]
+                : { key: 'value', value }
+        ),
+        eventC
+    });
+
+    return slider;
+}
+
+function TextField({
+    label,
+    placeholder,
+    ariaLabel,
+    Parent = null,
+    BorderRadius,
+    attributes = [],
+    eventC = {}
+}) {
+    const attrList = normalizeAttributes(
+        BorderRadius ? { key: 'class', value: BorderRadius } : null,
+        ...attributes,
+        label ? { key: 'label', value: label } : null,
+        placeholder ? { key: 'placeholder', value: placeholder } : null,
+        ariaLabel ? { key: 'aria-label', value: ariaLabel } : null
+    );
+
+    const field = webx.createElement({
+        tag: 'md-outlined-text-field',
+        parent: Parent,
+        attribute: attrList,
+        eventC
+    });
+
+    return field;
+}
+
+function Tabs({
+    tabs = [],      
+    onChange = () => {},
+    Parent = null,
+    BorderRadius,
+    attributes = [],
+    eventC = {}
+}) {
+    const tabContainer = webx.createElement({
+        tag: 'md-tabs',
+        parent: Parent,
+        attribute: normalizeAttributes(
+            BorderRadius ? { key: 'class', value: BorderRadius } : null,
+            ...attributes
+        ),
+        eventC
+    });
+
+    tabs.forEach(({ label, isActive }) => {
+        const tab = webx.createElement({
+            tag: 'md-primary-tab',
+            html: label,
+            attribute: isActive ? [{ key: 'active' }] : [],
+            parent: tabContainer
+        });
+    });
+
+    tabContainer.addEventListener('change', (event) => {
+        const tabs = [...tabContainer.querySelectorAll('md-primary-tab')];
+        const index = tabs.findIndex(t => t.hasAttribute('active'));
+        onChange(index, event); 
+    });
+
+    return tabContainer;
+}
