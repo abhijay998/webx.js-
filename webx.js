@@ -1,4 +1,4 @@
-/*!
+ /*!
  * WebX v1.0.0
  * Copyright © 2025 Abhijay Singh Meena
  * All rights reserved.
@@ -6,6 +6,7 @@
  */
 
 /* read LICENSE */
+ 
  const root = document.getElementById("root");
 const body = document.body;
 const head = document.head;
@@ -1460,14 +1461,14 @@ function normalizeAttributes(...args) {
     type = 'filled',
     margin = 2,
     BorderRadius,
-    Html,
+    html,
     Parent = null,
     eventC,
     attributes
 }) {
     const btn = webx.createElement({
         tag: `md-${type}-button`,
-        html: Html,
+        html: html,
         parent: Parent,
         attribute: normalizeAttributes(
             { key: 'class', value: `m-${margin}` },
@@ -1731,6 +1732,7 @@ function Slider({
 }
 
 function TextField({
+    type = "outlined",
     label,
     placeholder,
     ariaLabel,
@@ -1748,7 +1750,7 @@ function TextField({
     );
 
     const field = webx.createElement({
-        tag: 'md-outlined-text-field',
+        tag: `md-${type}-text-field`,
         parent: Parent,
         attribute: attrList,
         eventC
