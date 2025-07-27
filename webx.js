@@ -6,8 +6,8 @@
  */
 
 /* read LICENSE */
- 
- const root = document.getElementById("root");
+
+const root = document.getElementById("root");
 const body = document.body;
 const head = document.head;
 
@@ -20,8 +20,8 @@ function log(args, color, from) {
     else { console.log('%c[webx]', `color: ${color};`, args); }
 }
 
-function err(error) {
-    console.log(error)
+function err(Error) {
+    console.error(Error)
 }
 
 function logS(args, color, style, from) {
@@ -1793,4 +1793,111 @@ function Tabs({
     });
 
     return tabContainer;
+}
+
+function RenderElements({ 
+    element = () => {},
+    times = 10,
+    start = 0,
+}) {
+    const divCont = div(``);
+    for(i = start; i < times; i++) {
+        divCont.appendChild(element(i));
+    } return (divCont)
+}
+
+function func(a) {
+    a();
+}
+
+function GetName(Name = 'Name') {
+    return getById(Name)
+}
+
+const Throw = {
+    err: function ({ message = "this is a err", parent }) {
+        if(parent) {
+            parent.innerHTML = '';
+            parent.setAttribute('style', `
+                padding: 0.25cm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: ${Colors.red[500]};
+                color: white;
+                border-radius: 0.25cm;
+            `); webx.createElement({
+                tag: 'div',
+                html: h1(message),
+                style: `
+                    padding: 0.25cm;
+                `,
+                parent: parent,
+            })
+        } else {
+            getById("Body").innerHTML = '';
+            body.setAttribute('style', `
+                padding: 0.25cm;
+                hieght: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: ${Colors.red[500]};
+                color: white;
+                border-radius: 0.25cm;
+            `); return ( 
+                webx.createElement({
+                    tag: 'div',
+                    html: h1(message),
+                    style: `
+                        padding: 0.25cm;
+                        margin-top: 50vh;
+                    `
+                })
+            )
+        }
+    },
+
+    success: function ({ message = "this is a err", parent }) {
+        if(parent) {
+            parent.innerHTML = '';
+            parent.setAttribute('style', `
+                padding: 0.25cm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: ${Colors.green[500]};
+                color: white;
+                border-radius: 0.25cm;
+            `); webx.createElement({
+                tag: 'div',
+                html: h1(message),
+                style: `
+                    padding: 0.25cm;
+                `,
+                parent: parent,
+            })
+        } else {
+            getById("Body").innerHTML = '';
+            body.setAttribute('style', `
+                padding: 0.25cm;
+                hieght: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: ${Colors.green[500]};
+                color: white;
+                border-radius: 0.25cm;
+            `); return ( 
+                webx.createElement({
+                    tag: 'div',
+                    html: h1(message),
+                    style: `
+                        padding: 0.25cm;
+                        margin-top: 50vh;
+                    `
+                })
+            )
+        }
+    }
 }
